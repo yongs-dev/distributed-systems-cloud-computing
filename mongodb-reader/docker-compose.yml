@@ -1,0 +1,69 @@
+version: '3.8'
+services:
+  mongodb-0:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongodb-0
+    command: mongod --replSet rs0 --bind_ip_all --keyFile /data/configdb/mongodb-keyfile
+    environment:
+      MONGODB_INITDB_ROOT_USERNAME: mark
+      MONGODB_INITDB_ROOT_PASSWORD: mark
+    networks:
+      mongo-replica-net:
+        aliases:
+          - mongodb-0
+    ports:
+      - "27017:27017"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - /Users/yong/mongodb-data/rs0-0:/data/db
+      - /Users/yong/mongodb-data/mongodb-keyfile:/data/configdb/mongodb-keyfile
+
+  mongodb-1:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongodb-1
+    command: mongod --replSet rs0 --bind_ip_all --keyFile /data/configdb/mongodb-keyfile
+    environment:
+      MONGODB_INITDB_ROOT_USERNAME: mark
+      MONGODB_INITDB_ROOT_PASSWORD: mark
+    networks:
+      mongo-replica-net:
+        aliases:
+          - mongodb-1
+    ports:
+      - "27018:27017"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - /Users/yong/mongodb-data/rs0-1:/data/db
+      - /Users/yong/mongodb-data/mongodb-keyfile:/data/configdb/mongodb-keyfile
+    depends_on:
+      - mongodb-0
+
+  mongodb-2:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongodb-2
+    command: mongod --replSet rs0 --bind_ip_all --keyFile /data/configdb/mongodb-keyfile
+    environment:
+      MONGODB_INITDB_ROOT_USERNAME: mark
+      MONGODB_INITDB_ROOT_PASSWORD: mark
+    networks:
+      mongo-replica-net:
+        aliases:
+          - mongodb-2
+    ports:
+      - "27019:27017"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - /Users/yong/mongodb-data/rs0-2:/data/db
+      - /Users/yong/mongodb-data/mongodb-keyfile:/data/configdb/mongodb-keyfile
+    depends_on:
+      - mongodb-1
+
+networks:
+  mongo-replica-net:
+    name: mongo-replica-net
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: mongo_bridge
